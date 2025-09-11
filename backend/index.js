@@ -10,6 +10,8 @@ const Trip = require("./models/Trip");
 const Seat = require("./models/Seat");
 const cors = require("cors");
 const { sendPurchaseConfirmation } = require("./emailService");
+// This must be the LAST set of routes handled by Express
+const path = require("path");
 
 // --- Redis Connection ---
 const redisClient = new Redis({
@@ -219,8 +221,6 @@ app.post("/api/seats/purchase", async (req, res) => {
 });
 
 // --- FINALIZED: SERVE FRONTEND ---
-// This must be the LAST set of routes handled by Express
-const path = require("path");
 if (process.env.NODE_ENV === "production") {
   // Serve static files from the 'public' folder
   app.use(express.static(path.join(__dirname, "public")));
