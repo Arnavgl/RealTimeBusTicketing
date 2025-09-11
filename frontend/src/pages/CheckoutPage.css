@@ -1,0 +1,50 @@
+/* File: frontend/src/pages/CheckoutPage.css */
+.checkout-page {
+  max-width: 500px;
+  margin: 20px auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+.booking-summary p {
+  margin: 10px 0;
+}
+.timer {
+  color: #d9534f;
+  font-weight: bold;
+}
+.email-form {
+  margin: 20px 0;
+  display: flex; /* Use Flexbox for alignment */
+  flex-direction: column; /* Stack items vertically */
+  align-items: flex-start; /* Align items to the start (left) */
+}
+.email-form label {
+  display: block;
+  margin-bottom: 5px;
+}
+.email-form input {
+  width: 100%;
+  padding: 8px;
+  font-size: 16px;
+}
+.purchase-button {
+  width: 100%;
+  padding: 12px;
+  font-size: 18px;
+}
+
+.back-button {
+  width: 100%;
+  padding: 12px;
+  font-size: 18px;
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+.back-button:hover {
+  background-color: #5a6268;
+}

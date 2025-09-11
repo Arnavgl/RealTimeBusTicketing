@@ -1,0 +1,37 @@
+/* File: frontend/src/components/Seat.css */
+.seat {
+  width: 40px;
+  height: 40px;
+  border: 1px solid #777;
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 14px;
+  cursor: pointer;
+  user-select: none; /* Prevents text selection on click */
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.seat.available {
+  background-color: #bbf5a4; /* Light green */
+  color: #3c763d;
+}
+
+.seat.held {
+  background-color: #f6eab1; /* Light yellow */
+  color: #8a6d3b;
+  cursor: not-allowed;
+}
+
+.seat.sold {
+  background-color: #f6b4b4; /* Light red */
+  color: #a94442;
+  cursor: not-allowed;
+}
+
+.seat.user-held {
+  background-color: #337ab7; /* A distinct blue for user's selection */
+  color: white;
+  border: 2px solid #2e6da4;
+}
