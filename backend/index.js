@@ -1,8 +1,6 @@
 require("dotenv").config();
 // File: backend/index.js
 
-// --- Serve Frontend Static Files ---
-const path = require('path');
 const express = require("express");
 const http = require("http"); // NEW: Import http
 const WebSocket = require("ws"); // NEW: Import ws
@@ -215,20 +213,23 @@ app.post("/api/seats/purchase", async (req, res) => {
       ),
       trip: tripInfo, // CHANGED: Pass the whole tripInfo object
     });
-    
   } catch (error) {
     res.status(500).json({ message: "Purchase failed.", error: error.message });
   }
 });
 
-// Serve the built files from the React app
-app.use(express.static(path.join(__dirname, 'public')));
+// --- FINALIZED: SERVE FRONTEND ---
+// This must be the LAST set of routes handled by Express
+const path = require("path");
+if (process.env.NODE_ENV === "production") {
+  // Serve static files from the 'public' folder
+  app.use(express.static(path.join(__dirname, "public")));
 
-// For any request that doesn't match one of our API routes,
-// send back the main index.html file from the React app.
-app.get('/*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
+  // For any other GET request, send back the React's index.html file.
+  app.get("*", (req, res) => {
+    res.sendFile(path.join(__dirname, "public", "index.html"));
+  });
+}
 
 // --- Server Setup ---
 const PORT = process.env.PORT || 3001;
@@ -236,55 +237,54 @@ const PORT = process.env.PORT || 3001;
 async function setupServer() {
   try {
     await sequelize.sync({ force: true });
-    console.log('✅ PostgreSQL Database synchronized!');
+    console.log("✅ PostgreSQL Database synchronized!");
 
     // await redisClient.flushall();
     // console.log('✅ Redis Database flushed!');
 
     // --- Trip 1: Gurugram to Jaipur ---
     const trip1 = await Trip.create({
-      busName: 'Volvo Sleeper A/C',
-      source: 'Gurugram',
-      destination: 'Jaipur',
-      departureTime: new Date('2025-09-20T21:00:00'),
-      arrivalTime: new Date('2025-09-21T05:00:00')
+      busName: "Volvo Sleeper A/C",
+      source: "Gurugram",
+      destination: "Jaipur",
+      departureTime: new Date("2025-09-20T21:00:00"),
+      arrivalTime: new Date("2025-09-21T05:00:00"),
     });
     for (let i = 1; i <= 40; i++) {
       await Seat.create({ seatNumber: `A${i}`, price: 650, tripId: trip1.id });
     }
-    
+
     // --- Trip 2: Delhi to Manali ---
     const trip2 = await Trip.create({
-        busName: 'Himalayan Express',
-        source: 'Delhi',
-        destination: 'Manali',
-        departureTime: new Date('2025-09-22T19:30:00'),
-        arrivalTime: new Date('2025-09-23T08:00:00')
+      busName: "Himalayan Express",
+      source: "Delhi",
+      destination: "Manali",
+      departureTime: new Date("2025-09-22T19:30:00"),
+      arrivalTime: new Date("2025-09-23T08:00:00"),
     });
     for (let i = 1; i <= 36; i++) {
-        await Seat.create({ seatNumber: `S${i}`, price: 1250, tripId: trip2.id });
+      await Seat.create({ seatNumber: `S${i}`, price: 1250, tripId: trip2.id });
     }
 
     // --- Trip 3: Mumbai to Goa ---
     const trip3 = await Trip.create({
-        busName: 'Coastal Rider',
-        source: 'Mumbai',
-        destination: 'Goa',
-        departureTime: new Date('2025-09-25T22:00:00'),
-        arrivalTime: new Date('2025-09-26T07:30:00')
+      busName: "Coastal Rider",
+      source: "Mumbai",
+      destination: "Goa",
+      departureTime: new Date("2025-09-25T22:00:00"),
+      arrivalTime: new Date("2025-09-26T07:30:00"),
     });
     for (let i = 1; i <= 42; i++) {
-        await Seat.create({ seatNumber: `C${i}`, price: 950, tripId: trip3.id });
+      await Seat.create({ seatNumber: `C${i}`, price: 950, tripId: trip3.id });
     }
 
-    console.log('🌱 Dummy trips and seats have been added.');
+    console.log("🌱 Dummy trips and seats have been added.");
 
     server.listen(PORT, () => {
       console.log(`🚀 Server is listening on http://localhost:${PORT}`);
     });
-
   } catch (error) {
-    console.error('❌ An error occurred during server setup:', error);
+    console.error("❌ An error occurred during server setup:", error);
   }
 }
 
