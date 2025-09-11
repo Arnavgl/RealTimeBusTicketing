@@ -1,0 +1,9 @@
+/* File: frontend/src/pages/HomePage.css */
+.trip-list {
+  max-width: 700px;
+  margin: 0 auto;
+}
+.trip-link {
+  text-decoration: none;
+  color: inherit;
+}

@@ -54,3 +54,24 @@
   border-radius: 5px;
   cursor: pointer;
 }
+/* Add to the end of frontend/src/components/SeatMap.css */
+
+.navigation-header {
+    margin-bottom: 15px;
+}
+
+.back-button {
+    background-color: transparent;
+    border: 1px solid #6c757d;
+    color: #6c757d;
+    padding: 8px 15px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.back-button:hover {
+    background-color: #6c757d;
+    color: white;
+}

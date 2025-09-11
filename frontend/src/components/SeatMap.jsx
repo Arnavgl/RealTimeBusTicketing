@@ -1,13 +1,15 @@
 // File: frontend/src/components/SeatMap.jsx
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom"; // <-- NEW: Import useParams
+import { toast } from "react-toastify";
 import Seat from "./Seat";
 import "./SeatMap.css";
 
 const HOLD_DURATION_SECONDS = 20;
 
 const SeatMap = () => {
+  const { tripId } = useParams(); // <-- NEW: Get the tripId from the URL
   const [trip, setTrip] = useState(null);
   // This is the NEW state initializer
   const [heldSeats, setHeldSeats] = useState(() => {
@@ -25,40 +27,92 @@ const SeatMap = () => {
 
   const navigate = useNavigate();
 
+  // Effect 1: For fetching initial trip data
   useEffect(() => {
-    // ... (This useEffect for fetching data and the one for WebSockets are UNCHANGED)
+    // NEW: Use the dynamic tripId in the API call
     axios
-      .get("http://localhost:3001/api/trips/1")
-      .then((res) => setTrip(res.data));
+      .get(`http://localhost:3001/api/trips/${tripId}`)
+      .then((res) => {
+        setTrip(res.data);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch trip data:", err);
+        toast.error("Could not load seat map. Is the server running?");
+      });
+  }, [tripId]); // NEW: Add tripId as a dependency
+
+  // // ADD THIS NEW useEffect FOR FETCHING DATA
+  // useEffect(() => {
+  //   axios
+  //     .get("http://localhost:3001/api/trips/1")
+  //     .then((res) => {
+  //       setTrip(res.data);
+  //     })
+  //     .catch((err) => {
+  //       console.error("Failed to fetch trip data:", err);
+  //       toast.error("Could not load seat map. Is the server running?");
+  //     });
+  // }, []); // Empty array means it runs only once when the component loads
+
+  // REPLACE your old useEffect with this one for WebSockets & Notifications
+  useEffect(() => {
     const socket = new WebSocket("ws://localhost:3001");
+
     socket.onmessage = (event) => {
       const data = JSON.parse(event.data);
       if (data.type === "SEAT_UPDATE") {
-        setTrip((c) => ({
-          ...c,
-          Seats: c.Seats.map((s) =>
-            s.id === data.payload.id ? data.payload : s
+        const updatedSeat = data.payload;
+
+        if (updatedSeat.status === "held") {
+          toast.info(`Seat ${updatedSeat.seatNumber} was just held!`);
+        } else if (updatedSeat.status === "sold") {
+          toast.success(`Seat ${updatedSeat.seatNumber} was just sold!`);
+        } else if (updatedSeat.status === "available") {
+          toast.warn(`Seat ${updatedSeat.seatNumber} is now available again!`);
+        }
+
+        setTrip((currentTrip) => ({
+          ...currentTrip,
+          Seats: currentTrip.Seats.map((seat) =>
+            seat.id === updatedSeat.id ? updatedSeat : seat
           ),
         }));
       }
     };
+
+    // Cleanup the socket connection when the component unmounts
     return () => socket.close();
-  }, []);
+  }, []); // This also runs only once
 
   // useEffect(() => {
-  //   // ... (This useEffect for the timer is UNCHANGED)
-  //   if (timeLeft > 0) {
-  //     const timerId = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
-  //     return () => clearTimeout(timerId);
-  //   } else if (heldSeats.length > 0) {
-  //     const releasePromises = heldSeats.map((seat) =>
-  //       axios.post("http://localhost:3001/api/seats/release", {
-  //         seatId: seat.id,
-  //       })
-  //     );
-  //     Promise.all(releasePromises).finally(() => setHeldSeats([]));
-  //   }
-  // }, [timeLeft]);
+  //   const socket = new WebSocket("ws://localhost:3001");
+
+  //   socket.onmessage = (event) => {
+  //     const data = JSON.parse(event.data);
+  //     if (data.type === "SEAT_UPDATE") {
+  //       const updatedSeat = data.payload;
+
+  //       // --- Notification Logic ---
+  //       if (updatedSeat.status === "held") {
+  //         toast.info(`Seat ${updatedSeat.seatNumber} was just held!`);
+  //       } else if (updatedSeat.status === "sold") {
+  //         toast.success(`Seat ${updatedSeat.seatNumber} was just sold!`);
+  //       } else if (updatedSeat.status === "available") {
+  //         // This happens when a hold expires or is released
+  //         toast.warn(`Seat ${updatedSeat.seatNumber} is now available again!`);
+  //       }
+  //       // --- End of Notification Logic ---
+
+  //       setTrip((currentTrip) => ({
+  //         ...currentTrip,
+  //         Seats: currentTrip.Seats.map((seat) =>
+  //           seat.id === updatedSeat.id ? updatedSeat : seat
+  //         ),
+  //       }));
+  //     }
+  //   };
+  //   return () => socket.close();
+  // }, []); // This dependency array should be empty
 
   useEffect(() => {
     // If timer is still running, just count down.
@@ -94,6 +148,33 @@ const SeatMap = () => {
     // Every time heldSeats changes, save it to session storage.
     sessionStorage.setItem("heldSeats", JSON.stringify(heldSeats));
   }, [heldSeats]);
+
+  // NEW: Function to handle going back and releasing seats
+  const handleGoBackAndRelease = async () => {
+    if (heldSeats.length > 0) {
+      console.log("Releasing held seats before going back...");
+      const releasePromises = heldSeats.map((seat) =>
+        axios.post("http://localhost:3001/api/seats/release", {
+          seatId: seat.id,
+        })
+      );
+
+      try {
+        await Promise.all(releasePromises);
+      } catch (error) {
+        console.error("An error occurred while releasing seats:", error);
+      }
+    }
+
+    // Clean up local state and storage
+    setHeldSeats([]);
+    setTimeLeft(0);
+    sessionStorage.removeItem("heldSeats");
+    sessionStorage.removeItem("holdExpiry");
+
+    // Navigate back to the home page
+    navigate("/");
+  };
 
   const handleSeatClick = async (seat) => {
     const isAlreadyHeld = heldSeats.some((s) => s.id === seat.id);
@@ -189,9 +270,49 @@ const SeatMap = () => {
   const formatTime = (seconds) =>
     `${Math.floor(seconds / 60)}:${("0" + (seconds % 60)).slice(-2)}`;
 
+  // return (
+  //   <div className="seat-map-container">
+  //     <h2>{trip.routeName}</h2>
+  //     <div className="seat-map">
+  //       {trip.Seats.map((seat) => {
+  //         const isHeldByCurrentUser = heldSeats.some((s) => s.id === seat.id);
+  //         return (
+  //           <Seat
+  //             key={seat.id}
+  //             seatInfo={seat}
+  //             isHeldByCurrentUser={isHeldByCurrentUser}
+  //             onClick={handleSeatClick}
+  //           />
+  //         );
+  //       })}
+  //     </div>
+
+  //     {heldSeats.length > 0 && (
+  //       <div className="proceed-container">
+  //         <p>
+  //           {heldSeats.length} seats selected | Total: ₹{totalPrice.toFixed(2)}
+  //         </p>
+  //         <p>Time left to book: {formatTime(timeLeft)}</p>
+  //         <button onClick={handleProceedToCheckout} className="proceed-button">
+  //           Proceed to Checkout
+  //         </button>
+  //       </div>
+  //     )}
+  //   </div>
+  // );
+
   return (
     <div className="seat-map-container">
-      <h2>{trip.routeName}</h2>
+      {/* NEW: Add the back button here */}
+        <div className="navigation-header">
+            <button onClick={handleGoBackAndRelease} className="back-button">
+                &larr; Back to Trips
+            </button>
+        </div>
+      {/* NEW: Use source and destination for the heading */}
+      <h2>
+        {trip.source} to {trip.destination}
+      </h2>
       <div className="seat-map">
         {trip.Seats.map((seat) => {
           const isHeldByCurrentUser = heldSeats.some((s) => s.id === seat.id);
