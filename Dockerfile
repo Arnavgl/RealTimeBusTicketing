@@ -2,7 +2,7 @@
 
 # --- Stage 1: Build the Frontend ---
 # Use an official Node.js image as a builder
-FROM node:18-alpine AS frontend-builder
+FROM node:20-alpine AS frontend-builder
 
 # Set the working directory for the frontend
 WORKDIR /app/frontend
@@ -22,7 +22,7 @@ RUN npm run build
 
 # --- Stage 2: Setup the Backend ---
 # Use a fresh Node.js image for the final, smaller production image
-FROM node:18-alpine
+FROM node:20-alpine
 
 # Set the working directory for the backend
 WORKDIR /app/backend

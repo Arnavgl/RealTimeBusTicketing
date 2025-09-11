@@ -226,7 +226,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // For any request that doesn't match one of our API routes,
 // send back the main index.html file from the React app.
-app.get('*', (req, res) => {
+app.get('/*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
