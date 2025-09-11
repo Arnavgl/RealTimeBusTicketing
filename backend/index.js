@@ -491,9 +491,9 @@ app.post("/api/seats/purchase", async (req, res) => {
 app.use(express.static(path.join(__dirname, "public")));
 
 // The "catchall" handler: for any request that doesn't
-// match one of the API routes above, send back React's index.html file.
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+// This is the NEW, correct line
+app.get(/^(?!\/api).*/, (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // --- SERVER SETUP ---
