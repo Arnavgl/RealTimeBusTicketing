@@ -260,7 +260,9 @@ const SeatMap = () => {
   // };
 
   const handleProceedToCheckout = () => {
-    navigate("/checkout", { state: { heldSeats, timeLeft } });
+    // Add 'trip' to the state object
+    navigate('/checkout', { state: { heldSeats, timeLeft, trip } });
+    // navigate("/checkout", { state: { heldSeats, timeLeft } });
   };
 
   if (!trip) return <div>Loading Seat Map...</div>;
@@ -310,9 +312,19 @@ const SeatMap = () => {
             </button>
         </div>
       {/* NEW: Use source and destination for the heading */}
-      <h2>
+      {/* <h2>
         {trip.source} to {trip.destination}
-      </h2>
+      </h2> */}
+      <div className="trip-details-header">
+        <div className="route-info">
+          <h2>{trip.source} &rarr; {trip.destination}</h2>
+          <p>{trip.busName}</p>
+        </div>
+        <div className="time-info">
+          <p><strong>Depart:</strong> {new Date(trip.departureTime).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}</p>
+          <p><strong>Arrive:</strong> {new Date(trip.arrivalTime).toLocaleString('en-IN', { dateStyle: 'medium', timeStyle: 'short' })}</p>
+        </div>
+      </div>
       <div className="seat-map">
         {trip.Seats.map((seat) => {
           const isHeldByCurrentUser = heldSeats.some((s) => s.id === seat.id);

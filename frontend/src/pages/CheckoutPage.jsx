@@ -7,10 +7,17 @@ import "./CheckoutPage.css";
 const CheckoutPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { heldSeats, timeLeft: initialTimeLeft } = location.state || {
-    heldSeats: [],
-    initialTimeLeft: 0,
-  };
+  // const { heldSeats, timeLeft: initialTimeLeft } = location.state || {
+  //   heldSeats: [],
+  //   initialTimeLeft: 0,
+  // };
+
+  // First, get the trip object from location.state at the top of the component
+  const {
+    heldSeats,
+    timeLeft: initialTimeLeft,
+    trip,
+  } = location.state || { heldSeats: [], initialTimeLeft: 0, trip: null };
 
   const [timeLeft, setTimeLeft] = useState(initialTimeLeft);
   const [email, setEmail] = useState("");
@@ -69,6 +76,17 @@ const CheckoutPage = () => {
     <div className="checkout-page">
       <h2> Confirm Your Booking </h2>{" "}
       <div className="booking-summary">
+          {trip && (
+              <div className="trip-info-summary">
+                  <p><strong>Bus:</strong> {trip.busName}</p>
+                  <p><strong>Route:</strong> {trip.source} to {trip.destination}</p>
+              </div>
+          )}
+          <p><strong>Seats:</strong> {heldSeats.map(s => s.seatNumber).join(', ')}</p>
+          <p><strong>Total Price:</strong> ₹{totalPrice.toFixed(2)}</p>
+          <p className="timer"><strong>Time Left:</strong> {formatTime(timeLeft)}</p>
+      </div>
+      {/* <div className="booking-summary">
         <p>
           {" "}
           <strong> Seats: </strong>{" "}
@@ -82,7 +100,8 @@ const CheckoutPage = () => {
           {" "}
           <strong> Time Left: </strong> {formatTime(timeLeft)}
         </p>
-      </div>{" "}
+      </div> */}
+      {" "}
       <div className="email-form">
         <label htmlFor="email"> Email for Confirmation: </label>{" "}
         <input

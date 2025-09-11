@@ -195,15 +195,25 @@ app.post("/api/seats/purchase", async (req, res) => {
     const purchasedSeatsInfo = await Seat.findAll({ where: { id: seatIds } });
     const tripInfo = await Trip.findByPk(purchasedSeatsInfo[0].tripId);
 
+    // sendPurchaseConfirmation(email, {
+    //   // Hardcode a test email for now
+    //   seatNumbers: purchasedSeatsInfo.map((s) => s.seatNumber),
+    //   totalPrice: purchasedSeatsInfo.reduce(
+    //     (total, seat) => total + seat.price,
+    //     0
+    //   ),
+    //   routeName: tripInfo.routeName,
+    // });
+
     sendPurchaseConfirmation(email, {
-      // Hardcode a test email for now
       seatNumbers: purchasedSeatsInfo.map((s) => s.seatNumber),
       totalPrice: purchasedSeatsInfo.reduce(
         (total, seat) => total + seat.price,
         0
       ),
-      routeName: tripInfo.routeName,
+      trip: tripInfo, // CHANGED: Pass the whole tripInfo object
     });
+    
   } catch (error) {
     res.status(500).json({ message: "Purchase failed.", error: error.message });
   }
@@ -211,42 +221,59 @@ app.post("/api/seats/purchase", async (req, res) => {
 
 // --- Server Setup ---
 const PORT = 3001;
+// In backend/index.js, replace your entire setupServer function with this
 async function setupServer() {
   try {
     await sequelize.sync({ force: true });
-    console.log("✅ PostgreSQL Database synchronized!");
+    console.log('✅ PostgreSQL Database synchronized!');
 
-    // NEW: Add this line to clear Redis on startup
-    // await redisClient.flushDb();
-    // console.log("✅ Redis Database flushed!");
-    // const trip1 = await Trip.create({
-    //   routeName: "Gurugram to Jaipur",
-    //   departureTime: new Date("2025-09-12T08:00:00"),
-    //   arrivalTime: new Date("2025-09-12T13:00:00"),
-    // });
+    // await redisClient.flushall();
+    // console.log('✅ Redis Database flushed!');
+
+    // --- Trip 1: Gurugram to Jaipur ---
     const trip1 = await Trip.create({
-      busName: "Volvo Sleeper A/C",
-      source: "Gurugram",
-      destination: "Jaipur",
-      departureTime: new Date("2025-09-20T21:00:00"),
-      arrivalTime: new Date("2025-09-21T05:00:00"),
+      busName: 'Volvo Sleeper A/C',
+      source: 'Gurugram',
+      destination: 'Jaipur',
+      departureTime: new Date('2025-09-20T21:00:00'),
+      arrivalTime: new Date('2025-09-21T05:00:00')
     });
     for (let i = 1; i <= 40; i++) {
-      await Seat.create({
-        seatNumber: `A${i}`,
-        status: "available",
-        price: 650,
-        tripId: trip1.id,
-      });
+      await Seat.create({ seatNumber: `A${i}`, price: 650, tripId: trip1.id });
     }
-    console.log("🌱 Dummy trip and 40 seats have been added.");
+    
+    // --- Trip 2: Delhi to Manali ---
+    const trip2 = await Trip.create({
+        busName: 'Himalayan Express',
+        source: 'Delhi',
+        destination: 'Manali',
+        departureTime: new Date('2025-09-22T19:30:00'),
+        arrivalTime: new Date('2025-09-23T08:00:00')
+    });
+    for (let i = 1; i <= 36; i++) {
+        await Seat.create({ seatNumber: `S${i}`, price: 1250, tripId: trip2.id });
+    }
 
-    // NEW: Use server.listen instead of app.listen
+    // --- Trip 3: Mumbai to Goa ---
+    const trip3 = await Trip.create({
+        busName: 'Coastal Rider',
+        source: 'Mumbai',
+        destination: 'Goa',
+        departureTime: new Date('2025-09-25T22:00:00'),
+        arrivalTime: new Date('2025-09-26T07:30:00')
+    });
+    for (let i = 1; i <= 42; i++) {
+        await Seat.create({ seatNumber: `C${i}`, price: 950, tripId: trip3.id });
+    }
+
+    console.log('🌱 Dummy trips and seats have been added.');
+
     server.listen(PORT, () => {
       console.log(`🚀 Server is listening on http://localhost:${PORT}`);
     });
+
   } catch (error) {
-    console.error("❌ An error occurred during server setup:", error);
+    console.error('❌ An error occurred during server setup:', error);
   }
 }
 
