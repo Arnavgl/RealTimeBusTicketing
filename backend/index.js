@@ -1,6 +1,8 @@
 require("dotenv").config();
 // File: backend/index.js
 
+// --- Serve Frontend Static Files ---
+const path = require('path');
 const express = require("express");
 const http = require("http"); // NEW: Import http
 const WebSocket = require("ws"); // NEW: Import ws
@@ -219,8 +221,17 @@ app.post("/api/seats/purchase", async (req, res) => {
   }
 });
 
+// Serve the built files from the React app
+app.use(express.static(path.join(__dirname, 'public')));
+
+// For any request that doesn't match one of our API routes,
+// send back the main index.html file from the React app.
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 // --- Server Setup ---
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 // In backend/index.js, replace your entire setupServer function with this
 async function setupServer() {
   try {
