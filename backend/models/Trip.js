@@ -1,14 +1,22 @@
 // File: backend/models/Trip.js
-
 const { DataTypes } = require('sequelize');
-const sequelize = require('../db'); // We're importing the connection we already made
+const sequelize = require('../db');
 
 const Trip = sequelize.define('Trip', {
-  // Define the columns for the 'Trips' table
-  routeName: {
+  // NEW fields
+  busName: {
     type: DataTypes.STRING,
-    allowNull: false // This column cannot be empty
+    allowNull: false
   },
+  source: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  destination: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  // Keep the existing fields
   departureTime: {
     type: DataTypes.DATE,
     allowNull: false

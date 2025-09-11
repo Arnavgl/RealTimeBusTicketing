@@ -46,6 +46,31 @@ wss.on("connection", (ws) => {
 app.use(express.json());
 
 // --- API Endpoints ---
+
+// NEW: API Endpoint to get a list of all trips
+app.get("/api/trips", async (req, res) => {
+  try {
+    // We only fetch basic info, not all the seats, to keep it fast.
+    // const trips = await Trip.findAll({
+    //   attributes: ["id", "routeName", "departureTime", "arrivalTime"],
+    // });
+    const trips = await Trip.findAll({
+      attributes: [
+        "id",
+        "busName",
+        "source",
+        "destination",
+        "departureTime",
+        "arrivalTime",
+      ],
+    });
+    res.json(trips);
+  } catch (error) {
+    console.error("Failed to fetch trips list:", error);
+    res.status(500).json({ error: "Failed to fetch trips list" });
+  }
+});
+
 app.get("/api/trips/:tripId", async (req, res) => {
   try {
     const tripId = req.params.tripId;
@@ -189,11 +214,22 @@ const PORT = 3001;
 async function setupServer() {
   try {
     await sequelize.sync({ force: true });
-    console.log("✅ Database synchronized!");
+    console.log("✅ PostgreSQL Database synchronized!");
+
+    // NEW: Add this line to clear Redis on startup
+    // await redisClient.flushDb();
+    // console.log("✅ Redis Database flushed!");
+    // const trip1 = await Trip.create({
+    //   routeName: "Gurugram to Jaipur",
+    //   departureTime: new Date("2025-09-12T08:00:00"),
+    //   arrivalTime: new Date("2025-09-12T13:00:00"),
+    // });
     const trip1 = await Trip.create({
-      routeName: "Gurugram to Jaipur",
-      departureTime: new Date("2025-09-12T08:00:00"),
-      arrivalTime: new Date("2025-09-12T13:00:00"),
+      busName: "Volvo Sleeper A/C",
+      source: "Gurugram",
+      destination: "Jaipur",
+      departureTime: new Date("2025-09-20T21:00:00"),
+      arrivalTime: new Date("2025-09-21T05:00:00"),
     });
     for (let i = 1; i <= 40; i++) {
       await Seat.create({
