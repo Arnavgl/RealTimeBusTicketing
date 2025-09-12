@@ -1,18 +1,20 @@
 // File: backend/db.js
-const { Sequelize } = require('sequelize');
+const { Sequelize } = require("sequelize");
 
 // Now reading the URL from the .env file
 const dbUrl = process.env.DATABASE_URL;
 
 const sequelize = new Sequelize(dbUrl, {
-  dialect: 'postgres',
-  protocol: 'postgres',
+  dialect: "postgres",
+  protocol: "postgres",
   dialectOptions: {
+    // THIS IS THE NEW LINE YOU NEED TO ADD
+    family: 4,
     ssl: {
       require: true,
-      rejectUnauthorized: false
-    }
-  }
+      rejectUnauthorized: false,
+    },
+  },
 });
 
 // Test the connection
