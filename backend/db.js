@@ -8,8 +8,6 @@ const sequelize = new Sequelize(dbUrl, {
   dialect: "postgres",
   protocol: "postgres",
   dialectOptions: {
-    // THIS IS THE NEW LINE YOU NEED TO ADD
-    family: 4,
     ssl: {
       require: true,
       rejectUnauthorized: false,
