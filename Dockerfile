@@ -44,5 +44,7 @@ COPY --from=frontend-builder /app/frontend/dist /app/backend/public
 # Expose the port the app will run on
 EXPOSE 3001
 
+ENV NODE_ENV=production
+
 # The command to start the backend server when the container launches
 CMD ["node", "index.js"]
