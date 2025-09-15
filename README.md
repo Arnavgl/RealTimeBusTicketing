@@ -2,6 +2,8 @@
 
 A full-stack, real-time bus ticketing application built with modern web technologies. Users can browse available trips, view seat maps in real-time, hold seats, and complete purchases with automatic email confirmations.
 
+**Live Demo:** [https://realtimebusticketing.onrender.com](https://realtimebusticketing.onrender.com)
+
 ![Tech Stack](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
 ![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
