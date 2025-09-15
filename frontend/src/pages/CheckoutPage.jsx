@@ -1,7 +1,8 @@
 // File: frontend/src/pages/CheckoutPage.jsx
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import axios from "axios";
+// import axios from "axios";
+import api from '../api';
 import "./CheckoutPage.css";
 
 const CheckoutPage = () => {
@@ -34,7 +35,7 @@ const CheckoutPage = () => {
     if (timeLeft === 0 && heldSeats.length > 0) {
       console.log("Checkout timer expired. Releasing seats...");
       const releasePromises = heldSeats.map((seat) =>
-        axios.post("http://localhost:3001/api/seats/release", {
+        api.post("/api/seats/release", {
           seatId: seat.id,
         })
       );
@@ -55,7 +56,7 @@ const CheckoutPage = () => {
       return;
     }
     try {
-      await axios.post("http://localhost:3001/api/seats/purchase", {
+      await api.post('/api/seats/purchase', {
         seatIds,
         email,
       });

@@ -1,6 +1,7 @@
 // File: frontend/src/components/SeatMap.jsx
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+// import axios from "axios";
+import api from '../api';
 import { useNavigate, useParams } from "react-router-dom"; // <-- NEW: Import useParams
 import { toast } from "react-toastify";
 import Seat from "./Seat";
@@ -30,8 +31,9 @@ const SeatMap = () => {
   // Effect 1: For fetching initial trip data
   useEffect(() => {
     // NEW: Use the dynamic tripId in the API call
-    axios
-      .get(`http://localhost:3001/api/trips/${tripId}`)
+    api.get(`/api/trips/${tripId}`)
+    // axios
+    //   .get(`http://localhost:3001/api/trips/${tripId}`)
       .then((res) => {
         setTrip(res.data);
       })
@@ -126,7 +128,7 @@ const SeatMap = () => {
       console.log("Hold timer expired. Releasing seats...");
 
       const releasePromises = heldSeats.map((seat) =>
-        axios.post("http://localhost:3001/api/seats/release", {
+        api.post("/api/seats/release", {
           seatId: seat.id,
         })
       );
@@ -154,7 +156,7 @@ const SeatMap = () => {
     if (heldSeats.length > 0) {
       console.log("Releasing held seats before going back...");
       const releasePromises = heldSeats.map((seat) =>
-        axios.post("http://localhost:3001/api/seats/release", {
+        api.post("/api/seats/release", {
           seatId: seat.id,
         })
       );
@@ -182,7 +184,7 @@ const SeatMap = () => {
     if (isAlreadyHeld) {
       // --- DESELECT SEAT ---
       try {
-        await axios.post("http://localhost:3001/api/seats/release", {
+        await api.post('/api/seats/release', {
           seatId: seat.id,
         });
         const updatedSeats = heldSeats.filter((s) => s.id !== seat.id);
@@ -204,7 +206,7 @@ const SeatMap = () => {
       // --- SELECT SEAT ---
       if (seat.status === "available") {
         try {
-          await axios.post("http://localhost:3001/api/seats/hold", {
+          await api.post('/api/seats/hold', {
             seatId: seat.id,
           });
           setHeldSeats((current) => [...current, seat]);

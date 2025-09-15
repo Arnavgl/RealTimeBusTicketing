@@ -1,7 +1,8 @@
 // File: frontend/src/pages/HomePage.jsx
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import axios from 'axios';
+// import axios from 'axios';
+import api from '../api';
 import TripCard from '../components/TripCard';
 import './HomePage.css';
 
@@ -9,7 +10,8 @@ const HomePage = () => {
   const [trips, setTrips] = useState([]);
 
   useEffect(() => {
-    axios.get('http://localhost:3001/api/trips')
+    api.get('/api/trips')
+    // axios.get('http://localhost:3001/api/trips')
       .then(response => {
         setTrips(response.data);
       })
