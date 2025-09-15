@@ -8,10 +8,6 @@ import "./CheckoutPage.css";
 const CheckoutPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  // const { heldSeats, timeLeft: initialTimeLeft } = location.state || {
-  //   heldSeats: [],
-  //   initialTimeLeft: 0,
-  // };
 
   // First, get the trip object from location.state at the top of the component
   const {
@@ -87,21 +83,7 @@ const CheckoutPage = () => {
           <p><strong>Total Price:</strong> ₹{totalPrice.toFixed(2)}</p>
           <p className="timer"><strong>Time Left:</strong> {formatTime(timeLeft)}</p>
       </div>
-      {/* <div className="booking-summary">
-        <p>
-          {" "}
-          <strong> Seats: </strong>{" "}
-          {heldSeats.map((s) => s.seatNumber).join(", ")}
-        </p>
-        <p>
-          {" "}
-          <strong> Total Price: </strong> ₹{totalPrice.toFixed(2)}
-        </p>
-        <p className="timer">
-          {" "}
-          <strong> Time Left: </strong> {formatTime(timeLeft)}
-        </p>
-      </div> */}
+      {}
       {" "}
       <div className="email-form">
         <label htmlFor="email"> Email for Confirmation: </label>{" "}

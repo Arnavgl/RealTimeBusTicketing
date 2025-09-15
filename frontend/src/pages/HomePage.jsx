@@ -11,7 +11,6 @@ const HomePage = () => {
 
   useEffect(() => {
     api.get('/api/trips')
-    // axios.get('http://localhost:3001/api/trips')
       .then(response => {
         setTrips(response.data);
       })

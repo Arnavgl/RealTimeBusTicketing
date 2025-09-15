@@ -52,10 +52,6 @@ app.use(express.json());
 // NEW: API Endpoint to get a list of all trips
 app.get("/api/trips", async (req, res) => {
   try {
-    // We only fetch basic info, not all the seats, to keep it fast.
-    // const trips = await Trip.findAll({
-    //   attributes: ["id", "routeName", "departureTime", "arrivalTime"],
-    // });
     const trips = await Trip.findAll({
       attributes: [
         "id",
@@ -196,16 +192,6 @@ app.post("/api/seats/purchase", async (req, res) => {
     // NEW: Send the confirmation email after sending the response
     const purchasedSeatsInfo = await Seat.findAll({ where: { id: seatIds } });
     const tripInfo = await Trip.findByPk(purchasedSeatsInfo[0].tripId);
-
-    // sendPurchaseConfirmation(email, {
-    //   // Hardcode a test email for now
-    //   seatNumbers: purchasedSeatsInfo.map((s) => s.seatNumber),
-    //   totalPrice: purchasedSeatsInfo.reduce(
-    //     (total, seat) => total + seat.price,
-    //     0
-    //   ),
-    //   routeName: tripInfo.routeName,
-    // });
 
     sendPurchaseConfirmation(email, {
       seatNumbers: purchasedSeatsInfo.map((s) => s.seatNumber),
